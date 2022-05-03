@@ -10,5 +10,7 @@ import org.simpleframework.inject.annotation.Autowired;
 public class MainPageController {
     @Autowired
     HelloServlet helloServlet;
-
+    public void a(){
+        System.out.println("执行方法");
+    }
 }
