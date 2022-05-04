@@ -31,7 +31,7 @@ public class BeanContainer {
 
 
     /**
-     * 获取Bean容器的实例
+     * 获取Bean容器的实
      * 采用基于枚举的饿汉单例模式，可以防止反射或者反序列化的侵入，保证线程的安全
      *
      * @return

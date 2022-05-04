@@ -4,12 +4,10 @@ import lombok.Getter;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 import org.simpleframework.aop.aspect.AspectInfo;
+import org.simpleframework.util.ValidationUtil;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * @program: simpleframework
@@ -43,6 +41,14 @@ public class AspectListExecutor implements MethodInterceptor {
     @Override
     public Object intercept(Object proxy, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
         Object returnValue = null;
+        // 精筛
+        collectAccurateMatchedAspectList(method);
+        // 为空则无需代理
+        if(ValidationUtil.isEmpty(sortedAspectInfoList)){
+            returnValue=methodProxy.invokeSuper(proxy,args);
+            return returnValue;
+        }
+
         // 1. 按照order的顺序升序执行完所有Aspect的before方法
         invokeBeforeAdvices(method, args);
         try {
@@ -52,18 +58,30 @@ public class AspectListExecutor implements MethodInterceptor {
             returnValue = invokeAfterReturningAdvices(method, args, returnValue);
         } catch (Exception e) {
             // 4. 如果被代理方法抛出异常，则按照order的顺序降序执行完所有 Aspect 的afterThrowing方法
-            invokeAfterThrowingAdives(method, args, e);
+            invokeAfterThrowingAdvices(method, args, e);
         }
         return returnValue;
     }
 
+    private void collectAccurateMatchedAspectList(Method method) {
+        if (ValidationUtil.isEmpty(sortedAspectInfoList)) return;
+        Iterator<AspectInfo> it = sortedAspectInfoList.iterator();
+        while (it.hasNext()) {
+            AspectInfo aspectInfo = it.next();
+            // 移除不匹配的类
+            if (!aspectInfo.getPointcutLocator().accurateMatches(method))
+                it.remove();
+        }
+    }
+
     /**
      * 如果被代理方法抛出异常，则按照order的顺序降序执行完所有 Aspect 的afterThrowing方法
+     *
      * @param method
      * @param args
      * @param e
      */
-    private void invokeAfterThrowingAdives(Method method, Object[] args, Exception e) throws Throwable {
+    private void invokeAfterThrowingAdvices(Method method, Object[] args, Exception e) throws Throwable {
         for (int i = sortedAspectInfoList.size() - 1; i >= 0; i--) {
             sortedAspectInfoList.get(i).getAspectObject().afterThrowing(targetClass, method, args, e);
         }

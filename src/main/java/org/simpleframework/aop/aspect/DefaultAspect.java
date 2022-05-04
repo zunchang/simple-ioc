@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 
 /**
  * @program: simpleframework
- * @description:
+ * @description: 所有切面必须继承该类
  * @author: zjk
  * @create: 2022-05-02 21:43
  **/

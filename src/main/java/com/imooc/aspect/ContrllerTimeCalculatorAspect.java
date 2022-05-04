@@ -15,7 +15,8 @@ import java.lang.reflect.Method;
  * @create: 2022-05-03 16:46
  **/
 @Slf4j
-@Aspect(value = Controller.class)
+// @Aspect(value = Controller.class)
+@Aspect(pointcut = "within(com.imooc.controller.*)")
 @Order(0)
 public class ContrllerTimeCalculatorAspect extends DefaultAspect {
     private long timestampCache;

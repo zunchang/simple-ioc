@@ -3,6 +3,7 @@ package org.simpleframework.aop.aspect;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.simpleframework.aop.PointcutLocator;
 
 /**
  * @program: simpleframework
@@ -16,4 +17,5 @@ import lombok.Setter;
 public class AspectInfo {
     private int orderIndex;
     private DefaultAspect aspectObject;
+    private PointcutLocator pointcutLocator;
 }
